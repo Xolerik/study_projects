@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+<!--    Т.К. шаблон используется в by_rubric во views, то берётся значение из переменной current_id,-->
+<!--    данная переменная в свою очередь ссылается на конкретную рубрику, оттуда и вытаскивается имя рубрики-->
+    <title>{{current_rubric.name}} - Доска объявлений</title>
+</head>
+<body>
+    <h1>Объявления</h1>
+    Отображение имени руб
+    <h2>Рубрика: {{current_rubric.name}} </h2>
+    <div>
+        <a href="{% url 'index' %}">Главная</a>
+        <a href="{% url 'add' %}">Добавить</a>
+        {% for rubric in rubrics %}
+        <a href="{% url 'by_rubric' rubric.pk %}">{{rubric.name}}</a>
+        {% endfor %}
+    </div>
+    {% for bb in bbs %}
+    <div>
+        <h2>{{ bb.title }}</h2>
+        <p>{{ bb.content }}</p>
+        <p>{{ bb.published|date:"d.m.Y H:i:s" }}</p>
+    </div>
+    {% endfor %}
+</body>
+</html>
