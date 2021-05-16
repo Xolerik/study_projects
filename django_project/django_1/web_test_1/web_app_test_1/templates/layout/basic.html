@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--static - является модулем расширения, load - тег шаблонизатора для загрузки модуля расширения-->
+{% load static %}
+<html lang="ru">
 <head>
     <meta charset="UTF-8" content="text/html" http-equiv="Content-Type">
-    <title>{% block title %}Главная{% endblock %} - Доска объявлений</title>
+<!--    Формирует ссылку на файл со стилями относительно папки static-->
+    <link rel="stylesheet" type="text/css" href="{% static 'web_app_test_1/style.css' %}">
+    <title>{% block title %}{{current_rubric.name}}{% endblock %} - Доска объявлений</title>
 </head>
 <body>
    <header>
@@ -11,8 +15,8 @@
     <nav>
         <a href="{% url 'index' %}">Главная</a>
         <a href="{% url 'add' %}">Добавить</a>
-        {% for rubric in rurbrics %}
-        <a href="{% url 'by_rubrics' rubric.pk%}">{{ rubric.name }}</a>
+        {% for rubric in rubrics %}
+        <a href="{% url 'by_rubric' rubric.pk %}">{{rubric.name}}</a>
         {% endfor %}
     </nav>
     <section>
