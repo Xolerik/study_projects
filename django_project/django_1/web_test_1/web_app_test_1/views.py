@@ -43,7 +43,7 @@ def index(request):
 
 def by_rubric(request, rubric_id):
     """Функция конт-роллер для рубрик"""
-    # Фильтрация данных по внешнему рубрики
+    # Фильтрация данных по внешнему id рубрики
     bbs = Bd.objects.filter(rubric=rubric_id)
     # Список всех рубрик
     rubrics = Rubric.objects.all()

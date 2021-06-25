@@ -8,7 +8,7 @@ class Bd(models.Model):
     content = models.TextField(null=True, blank=True, verbose_name='Описание товара')
     price = models.FloatField(null=True, blank=True, verbose_name='Цена', help_text='Мин: 5000',
                               validators=[MinValueValidator(5000, ('Минимальная цена товара 5000'))])
-    published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации0')
+    published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации')
     # Внешний ключ. Привязка контента к рубрике.
     rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT, verbose_name='Рубрика')
 
@@ -35,7 +35,6 @@ class Bd(models.Model):
         verbose_name = 'Объявление'
         # Сортировка
         ordering = ['-published']
-
 
 class Rubric(models.Model):
     """Класс для описания рубрики"""
