@@ -40,6 +40,11 @@ def video_chipset(request, video_chipset_id):
     context = {"video_chipset": video_chipset}
     return render(request, 'main_shop/video_chipset.html', context)
 
+def video_cards(request):
+    """Функция контроллер для отображения списка видеокарт"""
+    video_chiposet = AMDLineVideoChipset.objects.all()
+    context = {"video_chiposet": video_chiposet}
+    return render(request, "main_shop/video_cards.html", context)
 
 def product_type(request, product_id):
     """Функция контроллер для типо продукта"""
