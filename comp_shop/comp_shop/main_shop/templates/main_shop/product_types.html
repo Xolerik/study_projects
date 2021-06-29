@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% extends "layout/basic.html" %}
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    {% block content %}
+    {% for producttype in producttypes %}
+    <div>
+        <h2>{{ producttypes.full_name }}</h2>
+    </div>
+    {% endfor %}
+    {% endblock %}
+</body>
+</html>

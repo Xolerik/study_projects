@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+{% extends 'layout/basic.html' %}
+<!--В тег block content мы заключаем контент, который уникальный для ДАННОЙ страницы-->
+{% block content %}
+{% for bb in bbs %}
+<div class="b">
+    <h2>{{ bb.title }}</h2>
+    <p>{{ bb.content }}</p>
+    <p><a href="{% url 'by_rubric' bb.rubric.pk%}">{{ bb.rubric.name }}</a></p>
+    <p>{{ bb.published|date:"d.m.Y H:i:s" }}</p>
+</div>
+{% endfor %}
+{% endblock %}
+</html>
