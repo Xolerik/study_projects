@@ -88,8 +88,6 @@ class AMDVideo(models.Model):
             errors['directx'] = ValidationError("Требуется указать версию DirectX")
         if not self.video_partners:
             errors['video_partners'] = ValidationError("Требуется указать производителя видеокарты")
-        if not self.sli:
-            errors['sli'] = ValidationError("Требуется указать режим совместимости SLI")
         if not self.line_chipset:
             errors['line_chipset'] = ValidationError("Требуется указать линейку чипсета")
         if not self.name_chipset:
@@ -119,8 +117,8 @@ class AMDVideoChipset(models.Model):
             raise ValidationError(errors)
 
     class Meta:
-        verbose_name = "Наименование"
-        verbose_name_plural = "Наименования"
+        verbose_name = "Чипсет видеокарты"
+        verbose_name_plural = "Чипсеты видеокарт"
         ordering = ['name_chipset']
 
 
@@ -138,8 +136,8 @@ class AMDLineVideoChipset(models.Model):
             raise ValidationError(errors)
 
     class Meta:
-        verbose_name = "Линейка чипсетов"
-        verbose_name_plural = "Линейки чипсетов"
+        verbose_name = "Линейка чипсетов видеокарт"
+        verbose_name_plural = "Линейки чипсетов видеокарт"
         ordering = ['line_chipset']
 
 
@@ -210,7 +208,7 @@ class AMDProcessorChipsetName(models.Model):
             raise ValidationError(errors)
 
     class Meta:
-        verbose_name = ("Наименование чипсента процессора")
+        verbose_name = ("Наименование чипсета процессора")
         verbose_name_plural = ("Наименования чипсетов процессоров")
 
 
