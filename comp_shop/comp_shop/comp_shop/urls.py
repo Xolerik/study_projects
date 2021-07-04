@@ -19,4 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('comp/', include("main_shop.urls")),
+    # Add Django site authentication urls (for login, logout, password management)
+    path("accounts/", include("django.contrib.auth.urls"))
 ]
