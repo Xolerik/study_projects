@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 # ContentType - мини фреймворк, который видит все модели из приложений, которые есть в Installed_apps в settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 
 # Параметры берутся из settings.AUTH_USER_MODEL (само поле скрыто, но есть значения по умолчанию)
 User = get_user_model()
@@ -10,13 +12,22 @@ User = get_user_model()
 
 class LatestProductsManager:
     """Очень сомнительный класс, следует переписать код в файле view применяя пагинатор"""
+
     @staticmethod
     def get_products_for_main_page(*args, **kwargs):
+        with_respect_to = kwargs.get("with_respect_to")
         products = []
         ct_models = ContentType.objects.filter(model__in=args)
         for ct_model in ct_models:
             model_products = ct_model.model_class()._base_manager.all().order_by('-id')[:5]
             products.extend(model_products)
+        if with_respect_to:
+            ct_model = ContentType.objects.filter(model=with_respect_to)
+            if ct_model.exists():
+                if with_respect_to in args:
+                    return sorted(
+                        products, key=lambda x: x.__class__.meta.model_name.startswith(with_respect_to), reverse=True
+                    )
         return products
 
 
@@ -39,12 +50,24 @@ class Product(models.Model):
     category = models.ForeignKey("Category", verbose_name="Категория", on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name="Наименование")
     slug = models.SlugField(unique=True)
-    image = models.ImageField(verbose_name="Изображение")
+    image = models.ImageField(verbose_name="Изображение",
+                              help_text="Загружайте изображение разрешением минимум 400х400")
     description = models.TextField(verbose_name="Описание товара", null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Цена")
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        """Проверка размера изображения"""
+        if not self.image:
+            raise ValidationError("Требуется загрузить изображение")
+        else:
+            w, h = get_image_dimensions(self.image)
+            if w <= 400:
+                raise ValidationError(f"Требуемое разрешения для загрузки от 400. У текущего изображения{w} ")
+            if h <= 400:
+                raise ValidationError(f"Требуемое разрешения для загрузки от 400. У текущего изображения{h} ")
 
     class Meta:
         abstract = True
