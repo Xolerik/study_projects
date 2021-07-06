@@ -1,3 +1,4 @@
+from PIL import Image
 from django.db import models
 from django.contrib.auth import get_user_model
 # ContentType - мини фреймворк, который видит все модели из приложений, которые есть в Installed_apps в settings
@@ -51,7 +52,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Наименование")
     slug = models.SlugField(unique=True)
     image = models.ImageField(verbose_name="Изображение",
-                              help_text="Загружайте изображение разрешением минимум 400х400")
+                              help_text="<b style='color:red; font-size:16px';>Загружайте изображение разрешением минимум 400х400</b>")
     description = models.TextField(verbose_name="Описание товара", null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Цена")
 
@@ -68,6 +69,16 @@ class Product(models.Model):
                 raise ValidationError(f"Требуемое разрешения для загрузки от 400. У текущего изображения{w} ")
             if h <= 400:
                 raise ValidationError(f"Требуемое разрешения для загрузки от 400. У текущего изображения{h} ")
+
+    def save(self, *args, **kwargs):
+        """Сохранение изображения"""
+        super().save()
+        img = Image.open(self.image)
+
+        if img.height > 500 or img.width > 500:
+            output_size = (500, 500)
+            img.thumbnail(output_size)
+            img.save(self.image)
 
     class Meta:
         abstract = True
