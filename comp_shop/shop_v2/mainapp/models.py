@@ -6,10 +6,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from django.urls import reverse
 
 # Параметры берутся из settings.AUTH_USER_MODEL (само поле скрыто, но есть значения по умолчанию)
 User = get_user_model()
 
+def get_product_url_(obj, viename):
+    """Получение url адреса модели"""
+    ct_model = obj.__class__.meta.model_name
+    return reverse(viename, kwargs={"ct_model": ct_model, "slug": obj.slug})
 
 class LatestProductsManager:
     """Очень сомнительный класс, следует переписать код в файле view применяя пагинатор"""
