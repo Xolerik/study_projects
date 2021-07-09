@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import DetailView
-from .models import Product, Smartphone
+from django.views.generic import DetailView, CreateView
+from .models import Product, Smartphone, Notebook
 # Create your views here.
 def index(request):
     # """Функция контроллер для стартовой страницы"""
@@ -18,7 +18,22 @@ def index(request):
     return render(request, "mainapp/base.html", {})
 
 class ProductDetailView(DetailView):
-    model = Smartphone
-    context_object_name = "smartphones"
-    template_name = "mainapp/product_detail.html"
-    slug_url_kwarg = "slug"
+
+    CT_MODEL_MODEL_CLASS = {
+        'notebook': Notebook,
+        'smartphone': Smartphone
+    }
+
+    def dispatch(self, request, *args, **kwargs):
+        self.model = self.CT_MODEL_MODEL_CLASS[kwargs['ct_model']]
+        #_base_manager - аналог objects для выборки объектов
+        self.queryset = self.model._base_manager.all()
+        return super().dispatch(request, *args, **kwargs)
+
+    context_object_name = 'product'
+    template_name = 'mainapp/product_detail.html'
+    slug_url_kwarg = 'slug'
+
+
+
+
