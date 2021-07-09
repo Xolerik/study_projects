@@ -13,6 +13,7 @@ User = get_user_model()
 
 def get_product_url_(obj, viename):
     """Получение url адреса модели"""
+    # Получает имя модели
     ct_model = obj.__class__.meta.model_name
     return reverse(viename, kwargs={"ct_model": ct_model, "slug": obj.slug})
 
@@ -55,7 +56,7 @@ class Product(models.Model):
     """Продукт"""
     category = models.ForeignKey("Category", verbose_name="Категория", on_delete=models.CASCADE)
     title = models.CharField(max_length=255, verbose_name="Наименование")
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, verbose_name='URL')
     image = models.ImageField(verbose_name="Изображение",
                               help_text="<b style='color:red; font-size:16px';>Загружайте изображение разрешением минимум 400х400</b>")
     description = models.TextField(verbose_name="Описание товара", null=True)
