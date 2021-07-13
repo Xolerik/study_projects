@@ -57,4 +57,7 @@ def get_product_spec(product, model_name):
 def product_spec(product):
     # Обращение к наименованию модели
     model_name = product.__class__._meta.model_name
+    if isinstance(product, Smartphone):
+        if not product.sd:
+            PRODUCT_SPEC['smartphone'].pop('Максимальный объем SD карты')
     return mark_safe(TABLE_HEAD + get_product_spec(product, model_name) + TABLE_TAIL)
