@@ -1,4 +1,5 @@
 from PIL import Image
+from io import BytesIO
 from django.db import models
 from django.contrib.auth import get_user_model
 # ContentType - мини фреймворк, который видит все модели из приложений, которые есть в Installed_apps в settings
@@ -6,16 +7,19 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from django.core.files import File
 from django.urls import reverse
 
 # Параметры берутся из settings.AUTH_USER_MODEL (само поле скрыто, но есть значения по умолчанию)
 User = get_user_model()
+
 
 def get_product_url_(obj, viename):
     """Получение url адреса модели"""
     # Получает имя модели
     ct_model = obj.__class__.meta.model_name
     return reverse(viename, kwargs={"ct_model": ct_model, "slug": obj.slug})
+
 
 class LatestProductsManager:
     """Очень сомнительный класс, следует переписать код в файле view применяя пагинатор"""
@@ -76,15 +80,16 @@ class Product(models.Model):
             if h <= 400:
                 raise ValidationError(f"Требуемое разрешения для загрузки от 400. У текущего изображения{h} ")
 
-    def save(self, *args, **kwargs):
+    def make_thumbnail(self, image, size=(500, 500)):
         """Сохранение изображения"""
-        super().save()
         img = Image.open(self.image)
-
         if img.height > 500 or img.width > 500:
-            output_size = (500, 500)
-            img.thumbnail(output_size)
-            img.save(self.image)
+            img.convert('RGB')  # Конвертируем изображение в дружественный для Pillow формат
+            img.thumbnail(size)  # Меняем разрешение изображения
+            thumb_io = BytesIO()  # Создаём BytesIO objects
+            img.save(thumb_io, 'JPEG', quality=25)  # Сохраняем изображение в виде BytesIO объекта
+            thumbnail = File(thumb_io, name=self.image.name)
+            return thumbnail
 
     class Meta:
         abstract = True
@@ -113,13 +118,13 @@ class Smartphone(Product):
     ram = models.CharField(max_length=100, verbose_name="Оперативная память")
     # Возможность добавлять внешнюю память
     sd = models.BooleanField(verbose_name='Наличие SD карты', default=True)
-    sd_volume_max = models.CharField(max_length=100, verbose_name="Максимальный объем встраиваемой памяти", null=True, blank=True)
+    sd_volume_max = models.CharField(max_length=100, verbose_name="Максимальный объем встраиваемой памяти", null=True,
+                                     blank=True)
     main_cam_mp = models.CharField(max_length=20, verbose_name="Главная камера")
     frontal_cam_mp = models.CharField(max_length=20, verbose_name="Фронтальная камера")
 
     def __str__(self):
         return f"{self.category.name} : {self.title}"
-
 
 class CartProduct(models.Model):
     """Заглушка - продукт корзины"""
