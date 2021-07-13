@@ -40,6 +40,8 @@ class SmartphoneAdmin(admin.ModelAdmin):
     list_display = ("title", "price", "diagonal", "resolution")
     # Шаблон для изменения стандартного шаблона админки
     change_form_template = 'mainapp/admin.html'
+    # Присоединяем кастомную форму к стандартной
+    form = SmartphoneAdminForm
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Сравнение поля из БД
