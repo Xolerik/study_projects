@@ -14,6 +14,11 @@ from django.urls import reverse
 User = get_user_model()
 
 
+def get_models_for_count(*model_names):
+    """Возвращает список моделей"""
+    return [models.Count(model_names) for model_name in model_names]
+
+
 def get_product_url_(obj, viename):
     """Получение url адреса модели"""
     # Получает имя модели
@@ -41,19 +46,45 @@ class LatestProductsManager:
                     )
         return products
 
-
 class LatestProducts:
-    objects = LatestProductsManager
+    objects = LatestProductsManager()
+
+
+class CategoryManager(models.Manager):
+    """Менеджер категорий"""
+    CATEGORY_NAME_COUNT_NAME = {
+        'Ноутбуки': 'notebook__count',
+        'Смартфоны': 'smartphone__count'
+    }
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def get_categories_for_left_sidebar(self):
+        models = get_models_for_count('notebook', 'smartphone')
+        qs = list(self.get_queryset().annotate(*models))
+        data = [
+            dict(name=c.name, url=c.get_absolute_url(), count=getattr(c, self.CATEGORY_NAME_COUNT_NAME[c.name]))
+            for c in qs
+        ]
+        return data
 
 
 class Category(models.Model):
-    """Наименование категории"""
-    name = models.CharField(max_length=255, verbose_name="Наименование категории")
+
+    name = models.CharField(max_length=255, verbose_name='Имя категории')
     slug = models.SlugField(unique=True)
+    objects = CategoryManager()
 
     def __str__(self):
-        """Возвращает строкове представление для админки сайта"""
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('category_detail', kwargs={'slug': self.slug})
+
+
+
+
 
 
 class Product(models.Model):
@@ -118,6 +149,7 @@ class Smartphone(Product):
     ram = models.CharField(max_length=100, verbose_name="Оперативная память")
     # Возможность добавлять внешнюю память
     sd = models.BooleanField(verbose_name='Наличие SD карты', default=True)
+    # Переделать с использованием choice поля
     sd_volume_max = models.CharField(max_length=100, verbose_name="Максимальный объем встраиваемой памяти", null=True,
                                      blank=True)
     main_cam_mp = models.CharField(max_length=20, verbose_name="Главная камера")
@@ -125,6 +157,7 @@ class Smartphone(Product):
 
     def __str__(self):
         return f"{self.category.name} : {self.title}"
+
 
 class CartProduct(models.Model):
     """Заглушка - продукт корзины"""
