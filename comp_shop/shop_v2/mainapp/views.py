@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, CreateView
-from .models import Product, Smartphone, Notebook
-# Create your views here.
-def index(request):
+from .models import Product, Smartphone, Notebook, Category
 
-    return render(request, "layout/base.html", {})
+def index(request):
+    categories = Category.objects.get_categories_for_left_sidebar()
+    return render(request, "layout/base.html", {'categories': categories})
 
 class ProductDetailView(DetailView):
 
@@ -23,6 +23,10 @@ class ProductDetailView(DetailView):
     template_name = 'mainapp/product_detail.html'
     slug_url_kwarg = 'slug'
 
-
-
+class CategoryDetailView(DetailView):
+    model = Category
+    queryset = Category.objects.all()
+    context_object_name = 'category'
+    template_name = 'mainapp/category_detail.html'
+    slug_url_kwarg = 'slug'
 
