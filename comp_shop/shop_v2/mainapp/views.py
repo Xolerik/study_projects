@@ -1,13 +1,22 @@
 from django.shortcuts import render
-from django.views.generic import DetailView, CreateView
-from .models import Product, Smartphone, Notebook, Category
+from django.views.generic import DetailView, CreateView, View
+from .models import Product, Smartphone, Notebook, Category, LatestProducts
+from .mixins import CategoryDetailMixin
 
-def index(request):
-    categories = Category.objects.get_categories_for_left_sidebar()
-    return render(request, "layout/base.html", {'categories': categories})
 
-class ProductDetailView(DetailView):
+class BaseView(View):
 
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.get_categories_for_left_sidebar()
+        products = LatestProducts.objects.get_products_for_main_page('notebook', 'smartphone')
+        context = {
+            'categories': categories,
+            'products': products
+        }
+        return render(request, "layout/base.html", context)
+
+
+class ProductDetailView(CategoryDetailMixin, DetailView):
     CT_MODEL_MODEL_CLASS = {
         'notebook': Notebook,
         'smartphone': Smartphone
@@ -15,7 +24,6 @@ class ProductDetailView(DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.model = self.CT_MODEL_MODEL_CLASS[kwargs['ct_model']]
-        #_base_manager - аналог objects для выборки объектов
         self.queryset = self.model._base_manager.all()
         return super().dispatch(request, *args, **kwargs)
 
@@ -23,10 +31,10 @@ class ProductDetailView(DetailView):
     template_name = 'mainapp/product_detail.html'
     slug_url_kwarg = 'slug'
 
-class CategoryDetailView(DetailView):
+
+class CategoryDetailView(CategoryDetailMixin, DetailView):
     model = Category
     queryset = Category.objects.all()
     context_object_name = 'category'
     template_name = 'mainapp/category_detail.html'
     slug_url_kwarg = 'slug'
-
