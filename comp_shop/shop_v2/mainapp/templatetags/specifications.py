@@ -1,7 +1,7 @@
 from django import template
 # Метод для html разметки передаваемой в шаблон
 from django.utils.safestring import mark_safe
-
+from ...mainapp.models import Smartphone
 
 register = template.Library()
 
@@ -53,7 +53,7 @@ def get_product_spec(product, model_name):
     return table_content
 
 
-@register.filter()
+@register.filter
 def product_spec(product):
     # Обращение к наименованию модели
     model_name = product.__class__._meta.model_name
