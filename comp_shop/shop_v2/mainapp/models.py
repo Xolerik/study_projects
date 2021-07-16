@@ -15,14 +15,14 @@ User = get_user_model()
 
 
 def get_models_for_count(*model_names):
-    """Возвращает список моделей"""
-    return [models.Count(model_names) for model_name in model_names]
+
+    return [models.Count(model_name) for model_name in model_names]
 
 
-def get_product_url_(obj, viename):
+def get_product_url(obj, viename):
     """Получение url адреса модели"""
     # Получает имя модели
-    ct_model = obj.__class__.meta.model_name
+    ct_model = obj.__class__._meta.model_name
     return reverse(viename, kwargs={"ct_model": ct_model, "slug": obj.slug})
 
 
@@ -46,6 +46,7 @@ class LatestProductsManager:
                     )
         return products
 
+
 class LatestProducts:
     objects = LatestProductsManager()
 
@@ -65,13 +66,12 @@ class CategoryManager(models.Manager):
         qs = list(self.get_queryset().annotate(*models))
         data = [
             dict(name=c.name, url=c.get_absolute_url(), count=getattr(c, self.CATEGORY_NAME_COUNT_NAME[c.name]))
-            for c in qs
+            for  c in qs
         ]
         return data
 
 
 class Category(models.Model):
-
     name = models.CharField(max_length=255, verbose_name='Имя категории')
     slug = models.SlugField(unique=True)
     objects = CategoryManager()
@@ -81,10 +81,6 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('category_detail', kwargs={'slug': self.slug})
-
-
-
-
 
 
 class Product(models.Model):
@@ -139,6 +135,9 @@ class Notebook(Product):
     def __str__(self):
         return f"{self.category.name} : {self.title}"
 
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
+
 
 class Smartphone(Product):
     """Смартфоны"""
@@ -158,6 +157,8 @@ class Smartphone(Product):
     def __str__(self):
         return f"{self.category.name} : {self.title}"
 
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
 
 class CartProduct(models.Model):
     """Заглушка - продукт корзины"""
