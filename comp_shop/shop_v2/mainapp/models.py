@@ -144,7 +144,7 @@ class Smartphone(Product):
     diagonal = models.CharField(max_length=50, verbose_name="Диагональ")
     display_type = models.CharField(max_length=50, verbose_name="Тип дисплэя")
     resolution = models.CharField(max_length=100, verbose_name="Разрешение экрана")
-    accum_value = models.CharField(max_length=100, verbose_name="Объем аккумулятора")
+    accum_volume = models.CharField(max_length=100, verbose_name="Объем аккумулятора")
     ram = models.CharField(max_length=100, verbose_name="Оперативная память")
     # Возможность добавлять внешнюю память
     sd = models.BooleanField(verbose_name='Наличие SD карты', default=True)
@@ -166,10 +166,11 @@ class CartProduct(models.Model):
     cart = models.ForeignKey("Cart", verbose_name="Корзина", on_delete=models.CASCADE, related_name="related_products")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+    # Автоматически заполнит поля content_type и object_id
     content_object = GenericForeignKey("content_type", "object_id")
     # Количество
     qty = models.PositiveIntegerField(default=1)
-    final_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Общая стоимость")
+    final_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="Общая стоимость", default=0)
 
     def __str__(self):
         return f"Продукт: {self.content_object}"
