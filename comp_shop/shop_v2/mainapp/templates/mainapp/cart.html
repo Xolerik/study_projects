@@ -1,19 +1,9 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<h3 class="text-center mt-5 mb-5">Ваша корзина {% if not cart.products.count %}пуста{% endif %}</h3>
-{% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>{{ message }}</strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    {% endfor %}
-{% endif %}
+
 <!--Обращаемся через cart к products-->
-{% if cart.products.count %}
+<h3>Ваша корзина: {% if not cart.products.count %} пуста {% endif %}</h3>
 <table class="table">
   <thead>
     <tr>
@@ -21,18 +11,21 @@
       <th scope="col">Изображение</th>
       <th scope="col">Цена</th>
       <th scope="col">Кол-во</th>
-        <th scope="col">Общая цена</th>
-      <th scope="col">Действие</th>
+      <th scope="col">Общая цена</th>
     </tr>
   </thead>
-  <tbody>
+    {% for item in cart.products.all %}
+    <tbody>
         <tr>
-          <td colspan="2"></td>
-          <td>Итого:</td>
-          <td>{{ cart.total_products }}</td>
-          <td><strong>{{ cart.final_price }} руб.</strong></td>
+          <td>{{ item.content_object.title }}</td>
+          <td><img width="200px" height="200px" class="img-thumbnail" src="{{ item.content_object.image.url }}"></td>
+          <td>{{ item.content_object.price }}</td>
+          <td>{{ item.qty }}</td>
+          <td><strong>{{ item.final_price }} руб.</strong></td>
         </tr>
   </tbody>
+    {% endfor %}
 </table>
-{% endif %}
+
+
 {% endblock content %}
