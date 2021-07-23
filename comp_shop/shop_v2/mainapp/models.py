@@ -186,7 +186,7 @@ class Cart(models.Model):
     for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Корзина: {self.owner}"
+        return f"ID корзины: {self.id} {self.owner}"
 
 
 class Customer(models.Model):
