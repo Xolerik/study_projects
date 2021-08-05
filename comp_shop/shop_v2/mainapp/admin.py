@@ -10,7 +10,7 @@ class SmartphoneAdminForm(ModelForm):
         # Обращение к экземпляру формы
         instance = kwargs.get('instance')
         # Проверка чекбокса sd и переопределение атрибутов виджета для поля sd_volume_max
-        if not instance.sd:
+        if instance and not instance.sd:
             self.fields['sd_volume_max'].widget.attrs.update({
                 'readonly': True, 'style ': 'background: lightgrey'
             })
