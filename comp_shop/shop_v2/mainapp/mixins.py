@@ -12,6 +12,7 @@ class CategoryDetailMixin(SingleObjectMixin):
     }
 
     def get_context_data(self, **kwargs):
+        # Проверяем, относится ли object к Category
         if isinstance(self.get_object(), Category):
             # Обращаемся к инстансу категории. Получем модель через slug.
             model = self.CATEGORY_SLUG_TO_PRODUCT_MODEL[self.get_object().slug]
