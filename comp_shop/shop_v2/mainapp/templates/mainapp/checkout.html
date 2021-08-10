@@ -1,4 +1,5 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
+<!--Библиотека django-crispy-forms-->
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -35,6 +36,7 @@
 <h3 class="text-center mt-5 mb-5">Форма заказа</h3>
 <form action="{% url 'make_order' %}" method="POST">
   {% csrf_token %}
+<!--  Используется из библиотеки django-crispy-forms-->
   {{ form|crispy }}
   <input type="submit" class="btn btn-success btn-block mb-3" values="Оформить заказ">
 </form>
