@@ -8,6 +8,9 @@ from .forms import OrderForm
 from django.contrib import messages
 from .utils import recalc_cart
 from django.db import transaction
+from django.contrib.auth.models import User
+
+
 
 
 class BaseView(CartMixin, View):
@@ -19,7 +22,7 @@ class BaseView(CartMixin, View):
         context = {
             'categories': categories,
             'products': products,
-            'cart': self.cart
+            'cart': self.cart,
         }
         return render(request, "layout/base.html", context)
 
@@ -91,27 +94,31 @@ class CategoryDetailView(CartMixin, CategoryDetailMixin, DetailView):
 
 class AddToCartView(CartMixin, View):
     """Добавление товара в корзин"""
-
+    user = User
     def get(self, request, *args, **kwargs):
-        ct_model, product_slug = kwargs.get('ct_model'), kwargs.get('slug')
-        # Определяем модель для товара
-        content_type = ContentType.objects.get(model=ct_model)
-        # Получаем продукт обращаясь через content_type к родительской модели.
-        # Далее через менеджер(objects) получаем продук по product_slug
-        product = content_type.model_class().objects.get(slug=product_slug)
-        # На основании полученных данных создаём корзину для текущего покупателя
-        # get_or_create возвращает кортеж из двух значений, где первое  - сам объект(полученный или созданный),
-        # второе - булевое значение (был создан или нет).
-        cart_product, created = CartProduct.objects.get_or_create(
-            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
-        )
-        if created:
-            self.cart.products.add(cart_product)
-        recalc_cart(self.cart)
-        messages.add_message(request, messages.INFO, "Товар успешно добавлен")
-        # Редирект в корзину, разделители в данном случае КРАЙНЕ важны для построение url адреса.
-        return HttpResponseRedirect('/shop/cart/')
-
+        if request.user.is_authenticated:
+            ct_model, product_slug = kwargs.get('ct_model'), kwargs.get('slug')
+            # Определяем модель для товара
+            content_type = ContentType.objects.get(model=ct_model)
+            # Получаем продукт обращаясь через content_type к родительской модели.
+            # Далее через менеджер(objects) получаем продук по product_slug
+            product = content_type.model_class().objects.get(slug=product_slug)
+            # На основании полученных данных создаём корзину для текущего покупателя
+            # get_or_create возвращает кортеж из двух значений, где первое  - сам объект(полученный или созданный),
+            # второе - булевое значение (был создан или нет).
+            cart_product, created = CartProduct.objects.get_or_create(
+                user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
+            )
+            if created:
+                self.cart.products.add(cart_product)
+            recalc_cart(self.cart)
+            messages.add_message(request, messages.INFO, "Товар успешно добавлен")
+            # Редирект в корзину, разделители в данном случае КРАЙНЕ важны для построение url адреса.
+            return HttpResponseRedirect('/shop/cart/')
+        else:
+            # Редирект на страницу входа или создания аккаунта, разделители в данном случае КРАЙНЕ важны для построение url адреса.
+            messages.add_message(request, messages.INFO, "Вход успешно выполнен.")
+            return HttpResponseRedirect('/accounts/login/')
 
 class DeleteFromCartView(CartMixin, View):
     """Удаление товара из корзины"""
@@ -190,4 +197,3 @@ class MakeOrderView(CartMixin, View):
             messages.add_message(request, messages.INFO, 'Спасибо за заказ! Менеджер с Вами свяжется')
             return HttpResponseRedirect('/shop')
         return HttpResponseRedirect('/checkout/')
-
