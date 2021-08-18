@@ -4,12 +4,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView, CreateView, View
 from .models import Product, Smartphone, Notebook, Category, LatestProducts, Customer, Cart, CartProduct
 from .mixins import CategoryDetailMixin, CartMixin
-from .forms import OrderForm
+from .forms import OrderForm, RegisterUserForm
 from django.contrib import messages
 from .utils import recalc_cart
 from django.db import transaction
 from django.contrib.auth.models import User
-
+# Стандартная форма регистрации пользователя
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
 
 
 
@@ -197,3 +199,10 @@ class MakeOrderView(CartMixin, View):
             messages.add_message(request, messages.INFO, 'Спасибо за заказ! Менеджер с Вами свяжется')
             return HttpResponseRedirect('/shop')
         return HttpResponseRedirect('/checkout/')
+
+class RegisterUser(CartMixin, CreateView):
+    """Регистрация пользователя"""
+    form_class = RegisterUserForm
+    template_name = 'account/register.html'
+    # Перенаправляет на адрес при успешной регистрации пользователя
+    success_url = reverse_lazy('login')
