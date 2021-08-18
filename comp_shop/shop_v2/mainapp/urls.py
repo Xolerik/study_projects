@@ -8,7 +8,8 @@ from .views import (
     DeleteFromCartView,
     ChangeQTYView,
     CheckOutViews,
-    MakeOrderView
+    MakeOrderView,
+    RegisterUser
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path('change_qty/<str:ct_model>/<str:slug>', ChangeQTYView.as_view(), name="change_qty"),
     path('checkout/', CheckOutViews.as_view(), name="checkout"),
     path('make_order/', MakeOrderView.as_view(), name="make_order"),
+    path('register/', RegisterUser.as_view(), name="register"),
 ]
