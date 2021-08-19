@@ -9,7 +9,7 @@ from .views import (
     ChangeQTYView,
     CheckOutViews,
     MakeOrderView,
-    RegisterUser
+    RegisterUser,
 )
 
 urlpatterns = [
